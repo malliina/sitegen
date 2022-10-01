@@ -1,0 +1,22 @@
+name: Test
+
+on: push
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Netlify
+        uses: netlify/actions/cli@master
+      - name: Set up Scala
+        uses: olafurpg/setup-scala@v10
+        with:
+          java-version: "adopt@1.11"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Run tests
+        run: sbt test
