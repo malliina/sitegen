@@ -61,11 +61,12 @@ export default function extractcss(options: ExtractOptions): Plugin {
           const content = "".concat(...contents)
           const name = path.parse(entry).name
           const ref = this.emitFile({
+            name: b.name,
             fileName: `${name}.css`,
             type: "asset",
             source: content
           })
-          console.log(`Created ${this.getFileName(ref)}.`)
+          console.log(`Created ${this.getFileName(ref)} from ${b.name}`)
         }
       })
     }

@@ -4,7 +4,6 @@ import sbt._
 
 object GeneratorClientPlugin extends AutoPlugin {
   val scalatagsVersion = "0.11.1"
-//  override def requires = ScalaJSBundlerPlugin
 
   override def projectSettings: Seq[Setting[?]] = Seq(
     libraryDependencies ++= Seq(

@@ -15,7 +15,7 @@ object Generator:
     val mode = if isProd then "prod" else "dev"
     log.info(s"Generating $mode build to $dist...")
     Files.createDirectories(dist)
-    val pages = Pages(isProd, dist)
+    val pages = Pages(isProd)
     val pageMap = Map(
       pages.hello -> "index.html"
     )

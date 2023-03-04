@@ -22,7 +22,7 @@ object Pages:
   def attrType[T](stringify: T => String): AttrValue[T] = (t: Builder, a: Attr, v: T) =>
     t.setAttr(a.name, Builder.GenericAttrValueSource(stringify(v)))
 
-class Pages(isProd: Boolean, root: Path):
+class Pages(isProd: Boolean):
   private val globalDescription = "Meny."
 
   private val scripts =
@@ -35,7 +35,7 @@ class Pages(isProd: Boolean, root: Path):
 
   def hello = index("Hello")(
     div(`class` := "content")(
-      p("Hello, world!")
+      p("Hello, world!!!")
     )
   )
 
@@ -68,29 +68,4 @@ class Pages(isProd: Boolean, root: Path):
   private def scriptAt(file: String, modifiers: Modifier*): Text.TypedTag[String] =
     script(src := findAsset(file), modifiers)
 
-  private def findAsset(file: String): String =
-    val closeable = Files.walk(root)
-    val candidates: Seq[Path] =
-      try
-        closeable
-          .iterator()
-          .asScala
-          .toList
-          .filter(p => Files.isRegularFile(p) && Files.isReadable(p))
-      finally closeable.close()
-    val lastSlash = file.lastIndexOf("/")
-    val nameStart = if lastSlash == -1 then 0 else lastSlash + 1
-    val name = file.substring(nameStart)
-    val dotIdx = name.lastIndexOf(".")
-    val noExt = name.substring(0, dotIdx)
-    val ext = name.substring(dotIdx + 1)
-    val result = candidates.filter { p =>
-      val candidateName = p.getFileName.toString
-      candidateName.startsWith(noExt) && candidateName.endsWith(ext)
-    }.sortBy { p => Files.getLastModifiedTime(p) }.reverse.headOption
-    val found = result.getOrElse(
-      fail(s"Not found: '$file'. Found ${candidates.mkString(", ")}.")
-    )
-    root.relativize(found).toString.replace("\\", "/")
-
-  private def fail(message: String) = throw new Exception(message)
+  private def findAsset(file: String) = HashedAssets.assets.getOrElse(file, file)

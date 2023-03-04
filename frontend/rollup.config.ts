@@ -21,12 +21,14 @@ const urlOptions = [
     maxSize: 48,
     fallback: "copy",
     assetsPath: "assets", // this must be defined but can be whatever since it "cancels out" the "../" in the source files
-    useHash: production,
-    hashOptions: {append: true}
+    useHash: true,
+    hashOptions: {
+      append: true
+    }
   }
 ]
 
-const entryNames = production ? "[name].[hash].js" : "[name].js"
+const entryNames = "[name].js"
 
 const css = () => extractcss({
   outDir: outputDir,
