@@ -13,7 +13,7 @@ object GeneratorClientPlugin extends AutoPlugin {
 
   import GeneratorKeys._
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
+  override def projectSettings: Seq[Setting[?]] = Seq(
     siteDir := baseDirectory.value / "target" / "site",
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "2.2.0",
@@ -48,9 +48,9 @@ object GeneratorClientPlugin extends AutoPlugin {
       Files.createDirectories(destDir.toPath)
       val name = af.metadata.get(BundlerFileTypeAttr) match {
         case Some(BundlerFileType.Application) => "app.js"
-        case Some(BundlerFileType.Library) => "library.js"
-        case Some(BundlerFileType.Loader) => "loader.js"
-        case _ => af.data.name
+        case Some(BundlerFileType.Library)     => "library.js"
+        case Some(BundlerFileType.Loader)      => "loader.js"
+        case _                                 => af.data.name
       }
       val dest = (destDir / name).toPath
       sLog.value.info(
@@ -60,4 +60,3 @@ object GeneratorClientPlugin extends AutoPlugin {
     }
   )
 }
-

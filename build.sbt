@@ -6,7 +6,7 @@ inThisBuild(
   Seq(
     organization := "com.malliina",
     version := "1.0.1",
-    scalaVersion := "3.1.1"
+    scalaVersion := "3.2.2"
   )
 )
 
@@ -14,8 +14,9 @@ val scalatagsVersion = GeneratorClientPlugin.scalatagsVersion
 
 val frontend = project
   .in(file("frontend"))
-  .enablePlugins(GeneratorClientPlugin)
+  .enablePlugins(GeneratorClientPlugin, NodeJsPlugin)
   .settings(
+    cwd := (Compile / npmUpdate / crossTarget).value,
     Compile / npmDependencies ++= Seq(
     ),
     Compile / npmDevDependencies ++= Seq(
@@ -39,7 +40,7 @@ val generator = project
   .settings(
     clientProject := frontend,
     libraryDependencies ++= SbtUtils.loggingDeps ++ Seq(
-      "com.malliina" %% "primitives" % "3.2.0",
+      "com.malliina" %% "primitives" % "3.4.0",
       "com.lihaoyi" %% "scalatags" % scalatagsVersion
     )
   )
