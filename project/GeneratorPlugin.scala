@@ -1,7 +1,7 @@
 import com.malliina.live.LiveReloadPlugin
 import com.malliina.live.LiveReloadPlugin.autoImport.{liveReloadRoot, refreshBrowsers, reloader}
-import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.{fastOptJS, fullOptJS}
-import sbt.Keys.{run, watchSources}
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.{fastLinkJS, fullLinkJS}
+import sbt.Keys.{run, streams, watchSources}
 import sbt._
 import sbtbuildinfo.BuildInfoPlugin
 import sbtbuildinfo.BuildInfoPlugin.autoImport.{BuildInfoKey, buildInfoKeys}
@@ -11,7 +11,6 @@ object GeneratorPlugin extends AutoPlugin {
 
   object autoImport {
     val mode = settingKey[Mode]("Build mode, dev or prod")
-    val isProd = settingKey[Boolean]("true if in prod mode, false otherwise")
 
     val DevMode = Mode.Dev
     val ProdMode = Mode.Prod
@@ -21,7 +20,7 @@ object GeneratorPlugin extends AutoPlugin {
   import GeneratorKeys._
   import autoImport._
 
-  override def projectSettings: Seq[Setting[_]] = Seq(
+  override def projectSettings: Seq[Setting[?]] = Seq(
     isProd := ((Global / mode).value == Mode.prod),
     siteDir := Def.settingDyn { clientProject.value / siteDir }.value,
     liveReloadRoot := siteDir.value.toPath,
@@ -31,15 +30,17 @@ object GeneratorPlugin extends AutoPlugin {
     ),
     refreshBrowsers := refreshBrowsers.triggeredBy(build).value,
     build := Def.taskDyn {
-      val jsTask = if (isProd.value) fullOptJS else fastOptJS
-      (Compile / run).toTask(" ")
-        .dependsOn(Def.task(if(isProd.value) () else reloader.value.start()))
+      val jsTask = if (isProd.value) fullLinkJS else fastLinkJS
+      val a = streams.value.log
+      (Compile / run)
+        .toTask(" ")
+        .dependsOn(Def.task(if (isProd.value) () else reloader.value.start()))
         .dependsOn(clientProject.value / Compile / jsTask / build)
     }.value,
     watchSources := watchSources.value ++ Def.taskDyn(clientProject.value / watchSources).value
   )
 
-  override def globalSettings: Seq[Setting[_]] = Seq(
+  override def globalSettings: Seq[Setting[?]] = Seq(
     mode := Mode.dev
   )
 }

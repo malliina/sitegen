@@ -23,15 +23,13 @@ object Pages:
     t.setAttr(a.name, Builder.GenericAttrValueSource(stringify(v)))
 
 class Pages(isProd: Boolean, root: Path):
-  val globalDescription = "Meny."
+  private val globalDescription = "Meny."
 
-  val scripts =
-    if isProd then scriptAt("frontend-opt.js", defer)
+  private val scripts =
+    if isProd then scriptAt("frontend.js", defer)
     else
       modifier(
-        scriptAt("library.js"),
-        scriptAt("loader.js"),
-        scriptAt("app.js"),
+        scriptAt("frontend.js"),
         script(src := LiveReload.script)
       )
 
@@ -48,8 +46,9 @@ class Pages(isProd: Boolean, root: Path):
         meta(charset := "UTF-8"),
         meta(
           name := "viewport",
-          content := "width=device-width, initial-scale=1.0, maximum-scale=1.0"
+          content := "width=device-width, initial-scale=1.0"
         ),
+        link(rel := "shortcut icon", `type` := "image/png", href := findAsset("img/jag-16x16.png")),
         meta(name := "description", content := globalDescription),
         meta(name := "keywords", content := "Site"),
         meta(property := "og:title", content := titleText),
@@ -63,16 +62,22 @@ class Pages(isProd: Boolean, root: Path):
     )
   )
 
-  def styleAt(file: String): Text.TypedTag[String] =
+  private def styleAt(file: String): Text.TypedTag[String] =
     link(rel := "stylesheet", href := findAsset(file))
 
-  def scriptAt(file: String, modifiers: Modifier*): Text.TypedTag[String] =
+  private def scriptAt(file: String, modifiers: Modifier*): Text.TypedTag[String] =
     script(src := findAsset(file), modifiers)
 
-  def findAsset(file: String): String =
-    val path = root.resolve(file)
-    val dir = path.getParent
-    val candidates = Files.list(dir).iterator().asScala.toList
+  private def findAsset(file: String): String =
+    val closeable = Files.walk(root)
+    val candidates: Seq[Path] =
+      try
+        closeable
+          .iterator()
+          .asScala
+          .toList
+          .filter(p => Files.isRegularFile(p) && Files.isReadable(p))
+      finally closeable.close()
     val lastSlash = file.lastIndexOf("/")
     val nameStart = if lastSlash == -1 then 0 else lastSlash + 1
     val name = file.substring(nameStart)
@@ -88,4 +93,4 @@ class Pages(isProd: Boolean, root: Path):
     )
     root.relativize(found).toString.replace("\\", "/")
 
-  def fail(message: String) = throw new Exception(message)
+  private def fail(message: String) = throw new Exception(message)
