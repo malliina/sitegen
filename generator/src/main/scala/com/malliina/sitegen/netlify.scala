@@ -55,10 +55,10 @@ class NetlifyClient:
     writeLines(netlifyHeaders.map(_.asString), to)
     to
 
-  def writeLines(lines: Seq[String], to: Path) =
+  private def writeLines(lines: Seq[String], to: Path) =
     FileIO.writeIfChanged(lines.mkString, to)
 
-  def walk(path: Path) =
+  private def walk(path: Path) =
     val closeable = Files.walk(path)
     try closeable.iterator().asScala.toList
     finally closeable.close()

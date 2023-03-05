@@ -13,7 +13,7 @@ object NetlifyPlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[?]] = Seq(
     deploy := {
-      val cmd = Seq("netlify deploy")
+      val cmd = Seq("netlify", "deploy")
       val params = if (isProd.value) List("--prod") else Nil
       IO.runProcessSync(
         cmd ++ params,
