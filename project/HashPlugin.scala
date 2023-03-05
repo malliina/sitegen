@@ -3,11 +3,15 @@ import sbt.Keys.{streams, target}
 import sbt._
 import sbt.internal.util.ManagedLogger
 import com.malliina.sitegen.FileIO
+import com.malliina.storage.StorageLong
+
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import scala.jdk.CollectionConverters._
 
-case class HashedFile(path: String, hashedPath: String, originalFile: Path, hashedFile: Path)
+case class HashedFile(path: String, hashedPath: String, originalFile: Path, hashedFile: Path) {
+  def size = Files.size(originalFile).bytes
+}
 
 object HashedFile {
   def from(original: Path, hashed: Path, root: Path) = HashedFile(
@@ -49,7 +53,7 @@ object HashPlugin extends AutoPlugin {
         }
       }.map(_.toFile)
     },
-    hashIncludeExts := Seq(".css", ".js", ".jpg", ".jpeg", ".png", ".svg"),
+    hashIncludeExts := Seq(".css", ".js", ".jpg", ".jpeg", ".png", ".svg", ".ico"),
     hashPackage := "com.malliina.sitegen",
     hashAssets := {
       val log = streams.value.log
@@ -106,6 +110,13 @@ object HashPlugin extends AutoPlugin {
     log: ManagedLogger
   ): File = {
     val inlined = hashes.map(h => s""""${h.path}" -> "${h.hashedPath}"""").mkString(", ")
+    val dataUris = hashes
+      .filter(h => h.size < 48.kilos)
+      .map { h =>
+        val dataUri = FileIO.dataUri(h.originalFile)
+        s""""${h.path}" -> "$dataUri""""
+      }
+      .mkString(", ")
     val objectName = "HashedAssets"
     val content =
       s"""
@@ -114,6 +125,7 @@ object HashPlugin extends AutoPlugin {
          |object $objectName {
          |  val prefix: String = "$prefix"
          |  val assets: Map[String, String] = Map($inlined)
+         |  val dataUris: Map[String, String] = Map($dataUris)
          |}
          |""".stripMargin.trim + IO.Newline
     val destFile = destDir(base, packageName) / s"$objectName.scala"

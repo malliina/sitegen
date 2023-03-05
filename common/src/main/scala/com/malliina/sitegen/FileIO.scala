@@ -8,11 +8,20 @@ import java.io._
 import java.nio.charset.StandardCharsets
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file._
+import java.util.Base64
 import java.util.zip.GZIPOutputStream
 
 object FileIO {
   val log = AppLogger(getClass)
   private val utf8 = StandardCharsets.UTF_8
+  private val fallbackContentType = "application/octet-stream"
+
+  def dataUri(file: Path): String = {
+    val contentType = Option(Files.probeContentType(file)).getOrElse(fallbackContentType)
+    s"data:$contentType;base64,${base64(file)}"
+  }
+
+  def base64(file: Path) = Base64.getEncoder.encodeToString(Files.readAllBytes(file))
 
   def writeJson[T: Encoder](t: T, to: Path): Path =
     write(t.asJson.spaces2.getBytes(utf8), to)
@@ -22,7 +31,6 @@ object FileIO {
 
   def copyIfChanged(from: Path, to: Path): Boolean = {
     val changed = !Files.exists(to) || Files.mismatch(from, to) != -1L
-    log.info(s"$from changed $changed")
     if (changed) copy(from, to)
     changed
   }
@@ -35,13 +43,12 @@ object FileIO {
 
   def mismatch(content: String, file: Path) = !isSameContent(content, file)
 
-  def isSameContent(content: String, file: Path) = {
+  def isSameContent(content: String, file: Path) =
     if (Files.exists(file)) {
       val oldHash = md5(file)
       val newHash = DigestUtils.md5Hex(content)
       oldHash == newHash
     } else false
-  }
 
   def md5(file: Path) = DigestUtils.md5Hex(Files.readAllBytes(file))
 
