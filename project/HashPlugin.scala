@@ -2,9 +2,9 @@ import org.apache.ivy.util.ChecksumHelper
 import sbt.Keys.{streams, target}
 import sbt._
 import sbt.internal.util.ManagedLogger
-
+import com.malliina.sitegen.FileIO
 import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Path, StandardCopyOption}
+import java.nio.file.{Files, Path}
 import scala.jdk.CollectionConverters._
 
 case class HashedFile(path: String, hashedPath: String, originalFile: Path, hashedFile: Path)
@@ -41,11 +41,9 @@ object HashPlugin extends AutoPlugin {
         allPaths(dirPath).flatMap { path =>
           val rel = dirPath.relativize(path)
           val dest = root.resolve(rel)
-          // TODO only copy on changes
           if (Files.isRegularFile(path)) {
-            val file = Files.copy(path, dest, StandardCopyOption.REPLACE_EXISTING)
-            log.info(s"Copied $path to $file")
-            Option(file)
+            FileIO.copyIfChanged(path, dest)
+            Option(dest)
           } else if (Files.isDirectory(path)) { Option(Files.createDirectories(dest)) }
           else None
         }
@@ -127,9 +125,5 @@ object HashPlugin extends AutoPlugin {
   def destDir(base: File, packageName: String): File =
     packageName.split('.').foldLeft(base)((acc, part) => acc / part)
 
-  def allPaths(root: Path) = {
-    val closeable = Files.walk(root)
-    try closeable.iterator().asScala.toList
-    finally closeable.close()
-  }
+  def allPaths(root: Path) = FileIO.using(Files.walk(root))(_.iterator().asScala.toList)
 }

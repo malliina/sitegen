@@ -1,3 +1,5 @@
+package com.malliina.sitegen
+
 import org.slf4j.{Logger, LoggerFactory}
 
 object AppLogger {

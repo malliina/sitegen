@@ -1,11 +1,12 @@
 import com.malliina.live.LiveReloadPlugin
 import com.malliina.live.LiveReloadPlugin.autoImport.{liveReloadRoot, refreshBrowsers, reloader}
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.{fastLinkJS, fullLinkJS}
-import sbt.Keys.{run, sourceGenerators, streams, watchSources}
+import sbt.Keys.{run, sourceGenerators, watchSources}
 import sbt._
 import sbtbuildinfo.BuildInfoPlugin
 import sbtbuildinfo.BuildInfoPlugin.autoImport.{BuildInfoKey, buildInfoKeys}
 import HashPlugin.autoImport.{hash, hashRoot}
+import com.malliina.sitegen.Mode
 
 object GeneratorPlugin extends AutoPlugin {
   override def requires = BuildInfoPlugin && LiveReloadPlugin && HashPlugin

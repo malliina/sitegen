@@ -1,20 +1,49 @@
+package com.malliina.sitegen
+
 import io.circe.Encoder
 import io.circe.syntax.EncoderOps
+import org.apache.commons.codec.digest.DigestUtils
 
-import java.io.{FileInputStream, FileOutputStream, IOException, InputStream, OutputStream}
+import java.io._
 import java.nio.charset.StandardCharsets
 import java.nio.file.attribute.BasicFileAttributes
-import java.nio.file.{FileVisitResult, Files, Path, SimpleFileVisitor, StandardCopyOption, StandardOpenOption}
+import java.nio.file._
 import java.util.zip.GZIPOutputStream
 
 object FileIO {
   val log = AppLogger(getClass)
+  private val utf8 = StandardCharsets.UTF_8
 
   def writeJson[T: Encoder](t: T, to: Path): Path =
-    write(t.asJson.spaces2.getBytes(StandardCharsets.UTF_8), to)
+    write(t.asJson.spaces2.getBytes(utf8), to)
 
   def writeLines(lines: Seq[String], to: Path): Path =
-    write(lines.mkString("\n").getBytes(StandardCharsets.UTF_8), to)
+    write(lines.mkString("\n").getBytes(utf8), to)
+
+  def copyIfChanged(from: Path, to: Path): Boolean = {
+    val changed = !Files.exists(to) || Files.mismatch(from, to) != -1L
+    log.info(s"$from changed $changed")
+    if (changed) copy(from, to)
+    changed
+  }
+
+  def writeIfChanged(content: String, to: Path): Boolean = {
+    val changed = mismatch(content, to)
+    if (changed) write(content.getBytes(utf8), to)
+    changed
+  }
+
+  def mismatch(content: String, file: Path) = !isSameContent(content, file)
+
+  def isSameContent(content: String, file: Path) = {
+    if (Files.exists(file)) {
+      val oldHash = md5(file)
+      val newHash = DigestUtils.md5Hex(content)
+      oldHash == newHash
+    } else false
+  }
+
+  def md5(file: Path) = DigestUtils.md5Hex(Files.readAllBytes(file))
 
   def write(bytes: Array[Byte], to: Path): Path = {
     if (!Files.isRegularFile(to)) {

@@ -22,6 +22,8 @@ object Generator:
     )
     pageMap.foreach { case (page, file) =>
       val dest = dist.resolve(file)
-      if FileIO.contentDiffers(page.renderDoc, dest) then page.write(dest)
+      if FileIO.mismatch(page.renderDoc, dest) then page.write(dest)
     }
+    val health = dist.resolve("health")
+    FileIO.writeIfChanged(s"""{"version": "${BuildInfo.gitHash}"}""", health)
     NetlifyClient.writeHeaders(dist)

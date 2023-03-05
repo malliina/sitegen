@@ -3,7 +3,7 @@ package com.malliina.sitegen
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 
-import scala.collection.JavaConverters.asScalaIteratorConverter
+import scala.jdk.CollectionConverters.IteratorHasAsScala
 
 case class NetlifyHeader(path: String, headers: Map[String, String]):
   // https://docs.netlify.com/routing/headers/#syntax-for-the-headers-file
@@ -35,7 +35,7 @@ class NetlifyClient:
     writeLines(rs.map(_.asString), dir.resolve("_redirects"))
 
   def cached(dir: Path): Seq[WebsiteFile] =
-    walk(dir).map { p =>
+    FileIO.using(Files.walk(dir))(_.iterator().asScala.toList).map { p =>
       val relative = dir.relativize(p)
       val cache =
         if isCacheable(relative) then CacheControls.eternalCache
@@ -57,8 +57,3 @@ class NetlifyClient:
 
   private def writeLines(lines: Seq[String], to: Path) =
     FileIO.writeIfChanged(lines.mkString, to)
-
-  private def walk(path: Path) =
-    val closeable = Files.walk(path)
-    try closeable.iterator().asScala.toList
-    finally closeable.close()
