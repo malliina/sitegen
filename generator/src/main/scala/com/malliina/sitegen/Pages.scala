@@ -48,7 +48,11 @@ class Pages(isProd: Boolean):
           name := "viewport",
           content := "width=device-width, initial-scale=1.0"
         ),
-        link(rel := "shortcut icon", `type` := "image/png", href := findAsset("img/jag-16x16.png")),
+        link(
+          rel := "shortcut icon",
+          `type` := "image/png",
+          href := fileOrInline("img/jag-16x16.png")
+        ),
         meta(name := "description", content := globalDescription),
         meta(name := "keywords", content := "Site"),
         meta(property := "og:title", content := titleText),
@@ -68,4 +72,6 @@ class Pages(isProd: Boolean):
   private def scriptAt(file: String, modifiers: Modifier*): Text.TypedTag[String] =
     script(src := findAsset(file), modifiers)
 
+  private def fileOrInline(file: String) =
+    HashedAssets.dataUris.getOrElse(file, HashedAssets.assets.getOrElse(file, file))
   private def findAsset(file: String) = HashedAssets.assets.getOrElse(file, file)
