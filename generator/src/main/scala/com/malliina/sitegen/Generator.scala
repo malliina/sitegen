@@ -1,6 +1,7 @@
 package com.malliina.sitegen
 
 import buildinfo.BuildInfo
+import org.apache.commons.codec.digest.DigestUtils
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
@@ -19,5 +20,8 @@ object Generator:
     val pageMap = Map(
       pages.hello -> "index.html"
     )
-    pageMap.foreach { case (page, file) => page.write(dist.resolve(file)) }
+    pageMap.foreach { case (page, file) =>
+      val dest = dist.resolve(file)
+      if FileIO.contentDiffers(page.renderDoc, dest) then page.write(dest)
+    }
     NetlifyClient.writeHeaders(dist)

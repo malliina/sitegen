@@ -1,5 +1,7 @@
 package com.malliina.sitegen
 
+import org.apache.commons.codec.digest.DigestUtils
+
 import java.io.*
 import java.nio.charset.StandardCharsets
 import java.nio.file.attribute.BasicFileAttributes
@@ -9,8 +11,18 @@ import java.util.zip.GZIPOutputStream
 object FileIO:
   val log = AppLogger(getClass)
 
-  def writeLines(lines: Seq[String], to: Path): Path =
-    write(lines.mkString("\n").getBytes(StandardCharsets.UTF_8), to)
+  def writeIfChanged(content: String, to: Path): Boolean =
+    val changed = contentDiffers(content, to)
+    if changed then write(content.getBytes(StandardCharsets.UTF_8), to)
+    changed
+
+  def contentDiffers(content: String, file: Path) = !isSameContent(content, file)
+  def isSameContent(content: String, file: Path) =
+    if Files.exists(file) then
+      val oldHash = DigestUtils.md5Hex(Files.readAllBytes(file))
+      val newHash = DigestUtils.md5Hex(content)
+      oldHash == newHash
+    else false
 
   def write(bytes: Array[Byte], to: Path): Path =
     if !Files.isRegularFile(to) then
@@ -18,7 +30,8 @@ object FileIO:
       if !Files.isDirectory(dir) then Files.createDirectories(dir)
       Files.createFile(to)
     Files.write(to, bytes, StandardOpenOption.TRUNCATE_EXISTING)
-    log.info(s"Wrote ${to.toAbsolutePath}.")
+    val size = Files.size(to)
+    log.info(s"Wrote $size bytes to ${to.toAbsolutePath}.")
     to
 
   def copy(from: Path, to: Path): Unit =

@@ -22,7 +22,8 @@ val generator = project
     copyFolders += (Compile / resourceDirectory).value / "public",
     libraryDependencies ++= SbtUtils.loggingDeps ++ Seq(
       "com.malliina" %% "primitives" % "3.4.0",
-      "com.lihaoyi" %% "scalatags" % scalatagsVersion
+      "com.lihaoyi" %% "scalatags" % scalatagsVersion,
+      "commons-codec" % "commons-codec" % "1.15"
     )
   )
 

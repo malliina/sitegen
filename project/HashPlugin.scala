@@ -1,5 +1,5 @@
 import org.apache.ivy.util.ChecksumHelper
-import sbt.Keys.{baseDirectory, streams, target}
+import sbt.Keys.{streams, target}
 import sbt._
 import sbt.internal.util.ManagedLogger
 
@@ -8,6 +8,15 @@ import java.nio.file.{Files, Path, StandardCopyOption}
 import scala.jdk.CollectionConverters._
 
 case class HashedFile(path: String, hashedPath: String, originalFile: Path, hashedFile: Path)
+
+object HashedFile {
+  def from(original: Path, hashed: Path, root: Path) = HashedFile(
+    root.relativize(original).toString.replace('\\', '/'),
+    root.relativize(hashed).toString.replace('\\', '/'),
+    original,
+    hashed
+  )
+}
 
 object HashPlugin extends AutoPlugin {
   val algorithm = "md5"
@@ -42,24 +51,19 @@ object HashPlugin extends AutoPlugin {
         }
       }.map(_.toFile)
     },
-    hashIncludeExts := Seq(".css", ".js", ".jpg", ".jpeg", ".png"),
+    hashIncludeExts := Seq(".css", ".js", ".jpg", ".jpeg", ".png", ".svg"),
     hashPackage := "com.malliina.sitegen",
     hashAssets := {
       val log = streams.value.log
       val root = hashRoot.value.toPath
       val exts = hashIncludeExts.value
       allPaths(root).filter { p =>
+        val name = p.getFileName.toString
         Files.isRegularFile(p) &&
-        exts.exists(ext => p.toString.endsWith(ext)) &&
-        p.getFileName.toString.count(c => c == '.') < 2
+        exts.exists(ext => name.endsWith(ext)) &&
+        name.count(c => c == '.') < 2
       }.map { file =>
-        val hashed = prepFile(file, log)
-        HashedFile(
-          root.relativize(file).toString.replace('\\', '/'),
-          root.relativize(hashed).toString.replace('\\', '/'),
-          file,
-          hashed
-        )
+        HashedFile.from(file, prepFile(file, log), root)
       }
     },
     hashAssets := hashAssets.dependsOn(copy).value,
@@ -69,7 +73,7 @@ object HashPlugin extends AutoPlugin {
       val cached = FileFunction.cached(streams.value.cacheDirectory / "assets") { in =>
         val file = makeAssetsFile(
           target.value,
-          "com.malliina.sitegen",
+          hashPackage.value,
           "assets",
           hashes,
           log

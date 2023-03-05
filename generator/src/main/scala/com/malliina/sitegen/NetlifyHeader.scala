@@ -35,7 +35,7 @@ class NetlifyClient:
     writeLines(rs.map(_.asString), dir.resolve("_redirects"))
 
   def cached(dir: Path): Seq[WebsiteFile] =
-    Files.walk(dir).iterator().asScala.toList.map { p =>
+    walk(dir).map { p =>
       val relative = dir.relativize(p)
       val cache =
         if isCacheable(relative) then CacheControls.eternalCache
@@ -53,6 +53,12 @@ class NetlifyClient:
       )
     }
     writeLines(netlifyHeaders.map(_.asString), to)
+    to
 
   def writeLines(lines: Seq[String], to: Path) =
-    FileIO.write(lines.mkString.getBytes(StandardCharsets.UTF_8), to)
+    FileIO.writeIfChanged(lines.mkString, to)
+
+  def walk(path: Path) =
+    val closeable = Files.walk(path)
+    try closeable.iterator().asScala.toList
+    finally closeable.close()
