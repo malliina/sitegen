@@ -33,7 +33,6 @@ object GeneratorPlugin extends AutoPlugin {
     refreshBrowsers := refreshBrowsers.triggeredBy(build).value,
     build := Def.taskDyn {
       val jsTask = if (isProd.value) fullLinkJS else fastLinkJS
-      val a = streams.value.log
       (Compile / run)
         .toTask(" ")
         .dependsOn(Def.task(if (isProd.value) () else reloader.value.start()))
