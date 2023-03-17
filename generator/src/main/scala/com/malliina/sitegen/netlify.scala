@@ -1,8 +1,9 @@
 package com.malliina.sitegen
 
+import com.malliina.build.FileIO
+
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
-
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
 case class NetlifyHeader(path: String, headers: Map[String, String]):

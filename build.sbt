@@ -10,26 +10,31 @@ inThisBuild(
   )
 )
 
-val scalatagsVersion = GeneratorClientPlugin.scalatagsVersion
-
-val common = project.in(file("common"))
+val scalatagsVersion = "0.12.0"
 
 val frontend = project
   .in(file("frontend"))
-  .enablePlugins(GeneratorClientPlugin, NodeJsPlugin, RollupPlugin)
+  .enablePlugins(NodeJsPlugin, RollupPlugin)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.scala-js" %%% "scalajs-dom" % "2.4.0",
+      "com.lihaoyi" %%% "scalatags" % scalatagsVersion
+    )
+  )
 
 val generator = project
   .in(file("generator"))
-  .dependsOn(common)
   .enablePlugins(GeneratorPlugin, NetlifyPlugin)
   .settings(
-    clientProject := frontend,
-    copyFolders += (Compile / resourceDirectory).value / "public",
+    scalajsProject := frontend,
+    copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
     libraryDependencies ++= SbtUtils.loggingDeps ++ Seq(
       "com.malliina" %% "primitives" % "3.4.0",
+      "com.malliina" %% "common-build" % "1.6.7",
       "com.lihaoyi" %% "scalatags" % scalatagsVersion,
       "commons-codec" % "commons-codec" % "1.15"
     ),
+    hashPackage := "com.malliina.sitegen",
     buildInfoKeys += "gitHash" -> gitHash
   )
 

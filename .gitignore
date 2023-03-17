@@ -10,6 +10,6 @@ hydra.sbt
 out
 dist
 .bsp
-
+node_modules/
 # Local Netlify folder
 .netlify

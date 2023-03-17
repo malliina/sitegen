@@ -1,6 +1,7 @@
 package com.malliina.sitegen
 
 import buildinfo.BuildInfo
+import com.malliina.build.{AppLogger, FileIO}
 import org.apache.commons.codec.digest.DigestUtils
 
 import java.nio.charset.StandardCharsets

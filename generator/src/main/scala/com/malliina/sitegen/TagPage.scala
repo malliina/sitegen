@@ -1,5 +1,6 @@
 package com.malliina.sitegen
 
+import com.malliina.build.{AppLogger, FileIO}
 import com.malliina.sitegen.TagPage.DocTypeTag
 
 import java.nio.charset.StandardCharsets
@@ -13,5 +14,4 @@ case class TagPage(tags: Text.TypedTag[String]):
   def write(to: Path) = FileIO.writeIfChanged(renderDoc, to)
 
 object TagPage:
-  val log = AppLogger(getClass)
   private val DocTypeTag = "<!DOCTYPE html>"

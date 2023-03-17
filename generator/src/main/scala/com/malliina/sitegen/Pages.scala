@@ -23,7 +23,7 @@ object Pages:
     t.setAttr(a.name, Builder.GenericAttrValueSource(stringify(v)))
 
 class Pages(isProd: Boolean):
-  private val globalDescription = "Meny."
+  private val globalDescription = "The best site."
 
   private val scripts =
     if isProd then scriptAt("frontend.js", defer)
@@ -35,7 +35,7 @@ class Pages(isProd: Boolean):
 
   def hello = index("Hello")(
     div(`class` := "content")(
-      p("Hello, world!!!")
+      p("Hello, world!")
     )
   )
 
