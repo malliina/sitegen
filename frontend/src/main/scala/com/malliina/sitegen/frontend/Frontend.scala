@@ -7,4 +7,3 @@ import scala.scalajs.js.annotation.JSImport
 object Frontend:
   def main(args: Array[String]): Unit =
     println("Hello, world!!!")
-    throw Exception("Test!")

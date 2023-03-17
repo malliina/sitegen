@@ -6,6 +6,7 @@ import {scalajs, production, outputDir} from "./target/scalajs.rollup.config.js"
 import path from "path"
 import extractcss from "./rollup-extract-css"
 import type {RollupOptions} from "rollup"
+import {defaultSourcemapFix, sourcemaps} from "./rollup-sourcemaps"
 
 const resourcesDir = "src/main/resources"
 const cssDir = path.resolve(resourcesDir, "css")
@@ -40,6 +41,7 @@ const config: RollupOptions[] = [
   {
     input: scalajs.input,
     plugins: [
+      sourcemaps({}),
       css(),
       resolve(), // tells Rollup how to find date-fns in node_modules
       commonjs(), // converts date-fns to ES modules
@@ -49,7 +51,10 @@ const config: RollupOptions[] = [
       dir: outputDir,
       format: "iife",
       name: "version",
-      entryFileNames: entryNames
+      entryFileNames: entryNames,
+      sourcemap: true,
+      sourcemapPathTransform: (relativeSourcePath, sourcemapPath) =>
+        defaultSourcemapFix(relativeSourcePath)
     },
     context: "window"
   },

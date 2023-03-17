@@ -2,6 +2,8 @@ package com.malliina.sitegen
 
 import buildinfo.BuildInfo
 import com.malliina.build.{AppLogger, FileIO}
+import io.circe.Json
+import io.circe.syntax.EncoderOps
 import org.apache.commons.codec.digest.DigestUtils
 
 import java.nio.charset.StandardCharsets
@@ -26,5 +28,6 @@ object Generator:
       if FileIO.mismatch(page.renderDoc, dest) then page.write(dest)
     }
     val health = dist.resolve("health")
-    FileIO.writeIfChanged(s"""{"version": "${BuildInfo.gitHash}"}""", health)
+    val healthJson = Json.obj("version" -> BuildInfo.gitHash.asJson)
+    FileIO.writeIfChanged(healthJson.noSpaces, health)
     NetlifyClient.writeHeaders(dist)
