@@ -20,7 +20,7 @@ The template uses:
 
 Navigate to http://localhost:10101. The site will reload on code changes.
 
-The `build` task builds a static website to `frontend/target/public`.
+The `build` task builds a static website to `frontend/target/assets`.
 
 ## Deployment
 
@@ -28,4 +28,4 @@ The `build` task builds a static website to `frontend/target/public`.
 1. Obtain and set environment variables `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID`.
 1. Run:
 
-       sbt "set Global / mode := ProdMode" deploy
+       sbt "mode prod" deploy
