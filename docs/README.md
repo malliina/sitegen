@@ -20,7 +20,7 @@ The template uses:
 
 Navigate to http://localhost:10101. The site will reload on code changes.
 
-The `build` task builds a static website to `frontend/target/assets`.
+The `build` task builds a static website to `@ASSETS_ROOT@`.
 
 ## Deployment
 

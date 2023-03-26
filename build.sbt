@@ -1,10 +1,6 @@
 import com.malliina.sbtutils.SbtUtils
-import com.malliina.rollup.UrlOption
-import com.malliina.build.FileIO
 import scala.sys.process.Process
 import scala.util.Try
-import java.nio.file.Path
-import java.nio.file.Files
 
 inThisBuild(
   Seq(
@@ -17,28 +13,6 @@ inThisBuild(
 val scalatagsVersion = "0.12.0"
 
 val updateDocs = taskKey[Unit]("Updates README.md")
-val packageLock = taskKey[Path]("Package lock")
-
-val docs = project
-  .in(file("mdoc"))
-  .settings(
-    publish / skip := true,
-    mdocVariables := Map("VERSION" -> version.value),
-    mdocOut := target.value / "docs",
-    mdocExtraArguments += "--no-link-hygiene",
-    updateDocs := {
-      val log = streams.value.log
-      val outFile = mdocOut.value / "README.md"
-      val rootReadme = (ThisBuild / baseDirectory).value / "README.md"
-      IO.copyFile(outFile, rootReadme)
-      val addStatus = Process(s"git add $rootReadme").run(log).exitValue()
-      if (addStatus != 0) {
-        sys.error(s"Unexpected status code $addStatus for git commit.")
-      }
-    },
-    updateDocs := updateDocs.dependsOn(mdoc.toTask("")).value
-  )
-  .enablePlugins(MdocPlugin)
 
 val frontend = project
   .in(file("frontend"))
@@ -47,16 +21,7 @@ val frontend = project
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "2.4.0",
       "com.lihaoyi" %%% "scalatags" % scalatagsVersion
-    ),
-    packageLock := {
-      val lockFile = (Compile / resourceDirectory).value.toPath.resolve("package-lock.json")
-      val dest = npmRoot.value / "package-lock.json"
-      if (Files.exists(lockFile)) {
-        FileIO.copyIfChanged(lockFile, dest)
-      }
-      dest
-    },
-    fullLinkJS / prepareRollup := (fullLinkJS / prepareRollup).dependsOn(packageLock).value
+    )
   )
 
 val generator = project
@@ -74,6 +39,32 @@ val generator = project
     hashPackage := "com.malliina.sitegen",
     buildInfoKeys += "gitHash" -> gitHash
   )
+
+val docs = project
+  .in(file("mdoc"))
+  .settings(
+    publish / skip := true,
+    mdocVariables := Map(
+      "VERSION" -> version.value,
+      "ASSETS_ROOT" -> (ThisBuild / baseDirectory).value.toPath
+        .relativize((frontend / assetsRoot).value)
+        .toString
+    ),
+    mdocOut := target.value / "docs",
+    mdocExtraArguments += "--no-link-hygiene",
+    updateDocs := {
+      val log = streams.value.log
+      val outFile = mdocOut.value / "README.md"
+      val rootReadme = (ThisBuild / baseDirectory).value / "README.md"
+      IO.copyFile(outFile, rootReadme)
+      val addStatus = Process(s"git add $rootReadme").run(log).exitValue()
+      if (addStatus != 0) {
+        sys.error(s"Unexpected status code $addStatus for git commit.")
+      }
+    },
+    updateDocs := updateDocs.dependsOn(mdoc.toTask("")).value
+  )
+  .enablePlugins(MdocPlugin)
 
 val site = project
   .in(file("."))
