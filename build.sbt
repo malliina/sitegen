@@ -1,4 +1,5 @@
 import com.malliina.sbtutils.SbtUtils
+import com.malliina.rollup.UrlOption
 import scala.sys.process.Process
 import scala.util.Try
 
@@ -14,7 +15,7 @@ val scalatagsVersion = "0.12.0"
 
 val frontend = project
   .in(file("frontend"))
-  .enablePlugins(NodeJsPlugin, RollupPlugin)
+  .enablePlugins(NodeJsPlugin, RollupPlugin, RollupPlugin)
   .settings(
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "2.4.0",

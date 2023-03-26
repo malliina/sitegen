@@ -1,14 +1,16 @@
 scalaVersion := "2.12.17"
 
-val utilsVersion = "1.6.7"
+val utilsVersion = "1.6.8"
 
 lazy val root = project
   .in(file("."))
   .settings(
-    libraryDependencies ++= Seq(
-      "com.malliina" %% "primitives" % "3.4.0",
-      "commons-codec" % "commons-codec" % "1.15"
-    ),
+    libraryDependencies ++= Seq("generic", "parser")
+      .map(m => "io.circe" %% s"circe-$m" % "0.14.5") ++
+      Seq(
+        "com.malliina" %% "primitives" % "3.4.0",
+        "commons-codec" % "commons-codec" % "1.15"
+      ),
     Seq(
       "com.malliina" % "sbt-utils-maven" % utilsVersion,
       "com.malliina" % "sbt-nodejs" % utilsVersion,

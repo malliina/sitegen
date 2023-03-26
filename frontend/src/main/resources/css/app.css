@@ -15,4 +15,9 @@ html {
   display: flex;
   justify-content: center;
   align-items: center;
+
+  &:hover {
+     text-decoration: none;
+     color: inherit;
+  }
 }
