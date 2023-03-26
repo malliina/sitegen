@@ -18,6 +18,7 @@ lazy val root = project
       "com.malliina" % "live-reload" % "0.5.0",
       "org.scala-js" % "sbt-scalajs" % "1.13.0",
       "org.scalameta" % "sbt-scalafmt" % "2.5.0",
-      "com.eed3si9n" % "sbt-buildinfo" % "0.11.0"
+      "com.eed3si9n" % "sbt-buildinfo" % "0.11.0",
+      "org.scalameta" % "sbt-mdoc" % "2.3.7"
     ) map addSbtPlugin
   )
