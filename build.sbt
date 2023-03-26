@@ -1,4 +1,5 @@
 import com.malliina.sbtutils.SbtUtils
+import com.malliina.rollup.Git
 import scala.sys.process.Process
 import scala.util.Try
 
@@ -37,7 +38,7 @@ val generator = project
       "commons-codec" % "commons-codec" % "1.15"
     ),
     hashPackage := "com.malliina.sitegen",
-    buildInfoKeys += "gitHash" -> gitHash
+    buildInfoKeys += "gitHash" -> Git.gitHash
   )
 
 val docs = project
@@ -69,11 +70,5 @@ val docs = project
 val site = project
   .in(file("."))
   .aggregate(frontend, generator, docs)
-
-def gitHash: String =
-  sys.env
-    .get("GITHUB_SHA")
-    .orElse(Try(Process("git rev-parse HEAD").lineStream.head).toOption)
-    .getOrElse("unknown")
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
