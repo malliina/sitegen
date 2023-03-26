@@ -17,7 +17,7 @@ val updateDocs = taskKey[Unit]("Updates README.md")
 
 val frontend = project
   .in(file("frontend"))
-  .enablePlugins(NodeJsPlugin, RollupPlugin, RollupPlugin)
+  .enablePlugins(NodeJsPlugin, RollupPlugin)
   .settings(
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "2.4.0",
@@ -33,7 +33,7 @@ val generator = project
     copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
     libraryDependencies ++= SbtUtils.loggingDeps ++ Seq(
       "com.malliina" %% "primitives" % "3.4.0",
-      "com.malliina" %% "common-build" % "1.6.7",
+      "com.malliina" %% "common-build" % "1.6.12",
       "com.lihaoyi" %% "scalatags" % scalatagsVersion,
       "commons-codec" % "commons-codec" % "1.15"
     ),
