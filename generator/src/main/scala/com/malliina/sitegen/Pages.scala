@@ -1,16 +1,10 @@
 package com.malliina.sitegen
 
-import com.malliina.http.FullUrl
 import com.malliina.live.LiveReload
 import com.malliina.sitegen.Pages.*
 import scalatags.Text
 import scalatags.Text.all.*
 import scalatags.text.Builder
-
-import java.nio.file.{Files, Path}
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import scala.jdk.CollectionConverters.IteratorHasAsScala
 
 object Pages:
   val time = tag("time")
@@ -26,10 +20,10 @@ class Pages(isProd: Boolean):
   private val globalDescription = "The best site."
 
   private val scripts =
-    if isProd then scriptAt("frontend.js", defer)
+    if isProd then scriptAt(FileAssets.frontend_js, defer)
     else
       modifier(
-        scriptAt("frontend.js"),
+        scriptAt(FileAssets.frontend_js),
         script(src := LiveReload.script)
       )
 
@@ -51,14 +45,14 @@ class Pages(isProd: Boolean):
         link(
           rel := "shortcut icon",
           `type` := "image/png",
-          href := fileOrInline("img/jag-16x16.png")
+          href := fileOrInline(FileAssets.img.jag_16x16_png)
         ),
         meta(name := "description", content := globalDescription),
         meta(name := "keywords", content := "Site"),
         meta(property := "og:title", content := titleText),
         meta(property := "og:description", content := globalDescription),
-        styleAt("styles.css"),
-        styleAt("fonts.css")
+        styleAt(FileAssets.styles_css),
+        styleAt(FileAssets.fonts_css)
       ),
       body(
         contents :+ scripts
@@ -68,10 +62,8 @@ class Pages(isProd: Boolean):
 
   private def styleAt(file: String): Text.TypedTag[String] =
     link(rel := "stylesheet", href := findAsset(file))
-
   private def scriptAt(file: String, modifiers: Modifier*): Text.TypedTag[String] =
     script(src := findAsset(file), modifiers)
-
   private def fileOrInline(file: String) =
     HashedAssets.dataUris.getOrElse(file, HashedAssets.assets.getOrElse(file, file))
   private def findAsset(file: String) = HashedAssets.assets.getOrElse(file, file)

@@ -1,13 +1,12 @@
 import com.malliina.sbtutils.SbtUtils
 import com.malliina.rollup.Git
 import scala.sys.process.Process
-import scala.util.Try
 
 inThisBuild(
   Seq(
     organization := "com.malliina",
     version := "1.0.1",
-    scalaVersion := "3.2.2"
+    scalaVersion := "3.3.1"
   )
 )
 
@@ -20,7 +19,7 @@ val frontend = project
   .enablePlugins(NodeJsPlugin, RollupPlugin)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "2.4.0",
+      "org.scala-js" %%% "scalajs-dom" % "2.8.0",
       "com.lihaoyi" %%% "scalatags" % scalatagsVersion
     )
   )
@@ -32,10 +31,10 @@ val generator = project
     scalajsProject := frontend,
     copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
     libraryDependencies ++= SbtUtils.loggingDeps ++ Seq(
-      "com.malliina" %% "primitives" % "3.4.0",
-      "com.malliina" %% "common-build" % "1.6.12",
+      "com.malliina" %% "primitives" % "3.4.6",
+      "com.malliina" %% "common-build" % "1.6.28",
       "com.lihaoyi" %% "scalatags" % scalatagsVersion,
-      "commons-codec" % "commons-codec" % "1.15"
+      "commons-codec" % "commons-codec" % "1.16.0"
     ),
     hashPackage := "com.malliina.sitegen",
     buildInfoKeys += "gitHash" -> Git.gitHash

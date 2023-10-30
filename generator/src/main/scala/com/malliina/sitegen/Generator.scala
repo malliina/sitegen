@@ -4,10 +4,8 @@ import buildinfo.BuildInfo
 import com.malliina.build.{AppLogger, FileIO}
 import io.circe.Json
 import io.circe.syntax.EncoderOps
-import org.apache.commons.codec.digest.DigestUtils
 
-import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Files, Path}
 
 object Generator:
   val log = AppLogger(getClass)
@@ -23,10 +21,9 @@ object Generator:
     val pageMap = Map(
       pages.hello -> "index.html"
     )
-    pageMap.foreach { case (page, file) =>
+    pageMap.foreach: (page, file) =>
       val dest = dist.resolve(file)
       if FileIO.mismatch(page.renderDoc, dest) then page.write(dest)
-    }
     val health = dist.resolve("health")
     val healthJson = Json.obj("version" -> BuildInfo.gitHash.asJson)
     FileIO.writeIfChanged(healthJson.noSpaces, health)
