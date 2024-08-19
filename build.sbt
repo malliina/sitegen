@@ -6,11 +6,11 @@ inThisBuild(
   Seq(
     organization := "com.malliina",
     version := "1.0.1",
-    scalaVersion := "3.3.1"
+    scalaVersion := "3.4.2"
   )
 )
 
-val scalatagsVersion = "0.12.0"
+val scalatagsVersion = "0.13.1"
 
 val updateDocs = taskKey[Unit]("Updates README.md")
 
@@ -31,10 +31,11 @@ val generator = project
     scalajsProject := frontend,
     copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
     libraryDependencies ++= SbtUtils.loggingDeps ++ Seq(
-      "com.malliina" %% "primitives" % "3.4.6",
-      "com.malliina" %% "common-build" % "1.6.28",
+      "ch.qos.logback" % "logback-classic" % "1.5.7",
+      "com.malliina" %% "primitives" % "3.7.3",
+      "com.malliina" %% "common-build" % "1.6.40",
       "com.lihaoyi" %% "scalatags" % scalatagsVersion,
-      "commons-codec" % "commons-codec" % "1.16.0"
+      "commons-codec" % "commons-codec" % "1.17.1"
     ),
     hashPackage := "com.malliina.sitegen",
     buildInfoKeys += "gitHash" -> Git.gitHash

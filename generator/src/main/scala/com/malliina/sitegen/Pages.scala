@@ -20,12 +20,16 @@ class Pages(isProd: Boolean):
   private val globalDescription = "The best site."
 
   private val scripts =
-    if isProd then scriptAt(FileAssets.frontend_js, defer)
-    else
-      modifier(
-        scriptAt(FileAssets.frontend_js),
-        script(src := LiveReload.script)
-      )
+    val all =
+      if isProd then Seq(FileAssets.frontend_js)
+      else
+        Seq(
+          FileAssets.frontend_js,
+          FileAssets.frontend_loader_js,
+          FileAssets.main_js,
+          LiveReload.script
+        )
+    all.map(scr => scriptAt(scr, defer))
 
   def hello = index("Hello")(
     div(`class` := "content")(
@@ -55,7 +59,7 @@ class Pages(isProd: Boolean):
         styleAt(FileAssets.fonts_css)
       ),
       body(
-        contents :+ scripts
+        contents ++ scripts
       )
     )
   )
