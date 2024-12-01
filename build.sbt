@@ -30,8 +30,8 @@ val generator = project
   .settings(
     scalajsProject := frontend,
     copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
-    libraryDependencies ++= SbtUtils.loggingDeps ++ Seq(
-      "ch.qos.logback" % "logback-classic" % "1.5.7",
+    libraryDependencies ++= Seq(
+      "ch.qos.logback" % "logback-classic" % "1.5.12",
       "com.malliina" %% "primitives" % "3.7.3",
       "com.malliina" %% "common-build" % "1.6.40",
       "com.lihaoyi" %% "scalatags" % scalatagsVersion,
