@@ -6,7 +6,7 @@ inThisBuild(
   Seq(
     organization := "com.malliina",
     version := "1.0.1",
-    scalaVersion := "3.4.2"
+    scalaVersion := "3.6.2"
   )
 )
 
@@ -31,11 +31,11 @@ val generator = project
     scalajsProject := frontend,
     copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
     libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % "1.5.12",
-      "com.malliina" %% "primitives" % "3.7.3",
-      "com.malliina" %% "common-build" % "1.6.40",
+      "ch.qos.logback" % "logback-classic" % "1.5.16",
+      "com.malliina" %% "primitives" % "3.7.4",
+      "com.malliina" %% "common-build" % "1.6.41",
       "com.lihaoyi" %% "scalatags" % scalatagsVersion,
-      "commons-codec" % "commons-codec" % "1.17.1"
+      "commons-codec" % "commons-codec" % "1.17.2"
     ),
     hashPackage := "com.malliina.sitegen",
     buildInfoKeys += "gitHash" -> Git.gitHash
