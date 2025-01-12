@@ -32,8 +32,8 @@ val generator = project
     copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
     libraryDependencies ++= Seq(
       "ch.qos.logback" % "logback-classic" % "1.5.16",
-      "com.malliina" %% "primitives" % "3.7.4",
-      "com.malliina" %% "common-build" % "1.6.41",
+      "com.malliina" %% "primitives" % "3.7.5",
+      "com.malliina" %% "common-build" % "1.6.43",
       "com.lihaoyi" %% "scalatags" % scalatagsVersion,
       "commons-codec" % "commons-codec" % "1.17.2"
     ),
