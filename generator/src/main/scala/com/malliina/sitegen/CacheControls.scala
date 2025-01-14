@@ -3,6 +3,7 @@ package com.malliina.sitegen
 import com.malliina.values.{StringCompanion, WrappedString}
 
 case class CacheControl(value: String) extends WrappedString
+
 object CacheControl extends StringCompanion[CacheControl]:
   val headerName = "Cache-Control"
 
