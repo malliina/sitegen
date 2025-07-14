@@ -1,4 +1,7 @@
+import com.malliina.build.FileIO
 import com.malliina.rollup.Git
+
+import java.nio.file.Path
 import scala.sys.process.Process
 
 inThisBuild(
@@ -30,6 +33,8 @@ val frontend = project
     )
   )
 
+val writeNetlifyToml = taskKey[Path]("Writes netlify.toml")
+
 val generator = project
   .in(file("generator"))
   .enablePlugins(GeneratorPlugin, NetlifyPlugin)
@@ -44,7 +49,20 @@ val generator = project
       "commons-codec" % "commons-codec" % versions.commonsCodec
     ),
     hashPackage := "com.malliina.sitegen",
-    buildInfoKeys += "gitHash" -> Git.gitHash
+    buildInfoKeys += "gitHash" -> Git.gitHash,
+    writeNetlifyToml := {
+      val base = (ThisBuild / baseDirectory).value.toPath
+      val publishDir = base.relativize(assetsRoot.value)
+      val content =
+        s"""
+          |[build]
+          |  base = "/"
+          |  publish = "$publishDir/"
+          |""".trim.stripMargin
+      val dest = base / "netlify.toml"
+      FileIO.writeIfChanged(content, dest)
+      dest
+    }
   )
 
 val docs = project
