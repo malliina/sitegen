@@ -21,14 +21,8 @@ class Pages(isProd: Boolean):
 
   private val scripts =
     val all =
-      if isProd then Seq(FileAssets.frontend_js)
-      else
-        Seq(
-          FileAssets.frontend_js,
-          FileAssets.frontend_loader_js,
-          FileAssets.main_js,
-          LiveReload.script
-        )
+      if isProd then Seq(FileAssets.main_js)
+      else Seq(FileAssets.main_js, LiveReload.script)
     all.map(scr => scriptAt(scr, defer))
 
   def hello = index("Hello")(
@@ -55,8 +49,7 @@ class Pages(isProd: Boolean):
         meta(name := "keywords", content := "Site"),
         meta(property := "og:title", content := titleText),
         meta(property := "og:description", content := globalDescription),
-        styleAt(FileAssets.styles_css),
-        styleAt(FileAssets.fonts_css)
+        styleAt(FileAssets.main_css)
       ),
       body(
         contents ++ scripts

@@ -1,4 +1,3 @@
-import com.malliina.sbtutils.SbtUtils
 import com.malliina.rollup.Git
 import scala.sys.process.Process
 
@@ -6,21 +5,28 @@ inThisBuild(
   Seq(
     organization := "com.malliina",
     version := "1.0.1",
-    scalaVersion := "3.6.2"
+    scalaVersion := "3.7.0"
   )
 )
 
-val scalatagsVersion = "0.13.1"
+val versions = new {
+  val commonBuild = "1.6.55"
+  val commonsCodec = "1.18.0"
+  val logback = "1.5.18"
+  val primitives = "3.7.10"
+  val scalaJsDom = "2.8.0"
+  val scalatags = "0.13.1"
+}
 
 val updateDocs = taskKey[Unit]("Updates README.md")
 
 val frontend = project
   .in(file("frontend"))
-  .enablePlugins(NodeJsPlugin, RollupPlugin)
+  .enablePlugins(NodeJsPlugin, EsbuildPlugin)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "2.8.0",
-      "com.lihaoyi" %%% "scalatags" % scalatagsVersion
+      "org.scala-js" %%% "scalajs-dom" % versions.scalaJsDom,
+      "com.lihaoyi" %%% "scalatags" % versions.scalatags
     )
   )
 
@@ -31,11 +37,11 @@ val generator = project
     scalajsProject := frontend,
     copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
     libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % "1.5.16",
-      "com.malliina" %% "primitives" % "3.7.5",
-      "com.malliina" %% "common-build" % "1.6.43",
-      "com.lihaoyi" %% "scalatags" % scalatagsVersion,
-      "commons-codec" % "commons-codec" % "1.17.2"
+      "ch.qos.logback" % "logback-classic" % versions.logback,
+      "com.malliina" %% "primitives" % versions.primitives,
+      "com.malliina" %% "common-build" % versions.commonBuild,
+      "com.lihaoyi" %% "scalatags" % versions.scalatags,
+      "commons-codec" % "commons-codec" % versions.commonsCodec
     ),
     hashPackage := "com.malliina.sitegen",
     buildInfoKeys += "gitHash" -> Git.gitHash

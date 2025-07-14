@@ -1,2 +1,2 @@
 import "./app.css"
-console.log("Assets only.")
+import "./fonts.css"

@@ -12,7 +12,7 @@ The template uses:
 
 - [Scala](https://docs.scala-lang.org/) 3.x
 - [node.js](https://nodejs.org/en/) 16.x
-- [rollup.js](https://www.rollupjs.org/) 3.x
+- [esbuild](https://esbuild.github.io/) 3.x
 
 ## Development
 
